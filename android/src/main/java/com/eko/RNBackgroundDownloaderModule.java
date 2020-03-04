@@ -314,6 +314,7 @@ public class RNBackgroundDownloaderModule extends ReactContextBaseJavaModule imp
       if (config != null) {
         WritableMap params = Arguments.createMap();
         params.putString("id", config.id);
+        params.putInt("written", (int)download.getDownloaded());
         ee.emit("downloadComplete", params);
       }
 
@@ -345,7 +346,7 @@ public class RNBackgroundDownloaderModule extends ReactContextBaseJavaModule imp
         params.putDouble("percent", ((double)download.getProgress()) / 100);
         progressReports.put(config.id, params);
         Date now = new Date();
-        if (now.getTime() - lastProgressReport.getTime() > 1500) {
+        if (now.getTime() - lastProgressReport.getTime() > 1000) {
           WritableArray reportsArray = Arguments.createArray();
           for (WritableMap report : progressReports.values()) {
             reportsArray.pushMap(report);

@@ -220,7 +220,10 @@ RCT_EXPORT_METHOD(checkForExistingDownloads: (RCTPromiseResolveBlock)resolve rej
             BOOL moved = [fileManager moveItemAtURL:location toURL:destURL error:&moveError];
             if (self.bridge) {
                 if (moved) {
-                    [self sendEventWithName:@"downloadComplete" body:@{@"id": taskCofig.id}];
+                    NSNumber *size = nil;
+                    NSError *error = nil;
+                    [destURL getResourceValue:&size forKey:NSURLFileSizeKey error:&error];
+                    [self sendEventWithName:@"downloadComplete" body:@{@"id": taskCofig.id, @"written": size}];
                 } else {
                     [self sendEventWithName:@"downloadFailed" body:@{@"id": taskCofig.id, @"error": [moveError localizedDescription]}];
                 }
@@ -250,7 +253,7 @@ RCT_EXPORT_METHOD(checkForExistingDownloads: (RCTPromiseResolveBlock)resolve rej
             }
             
             NSDate *now = [[NSDate alloc] init];
-            if ([now timeIntervalSinceDate:lastProgressReport] > 1.5 && progressReports.count > 0) {
+            if ([now timeIntervalSinceDate:lastProgressReport] > 1.0 && progressReports.count > 0) {
                 if (self.bridge) {
                     [self sendEventWithName:@"downloadProgress" body:[progressReports allValues]];
                 }

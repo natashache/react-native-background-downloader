@@ -18,7 +18,7 @@ RNBackgroundDownloaderEmitter.addListener('downloadProgress', events => {
 RNBackgroundDownloaderEmitter.addListener('downloadComplete', event => {
     let task = tasksMap.get(event.id);
     if (task) {
-        task._onDone(event.location);
+        task._onDone(event.written);
     }
     tasksMap.delete(event.id);
 });
