@@ -346,7 +346,7 @@ public class RNBackgroundDownloaderModule extends ReactContextBaseJavaModule imp
         params.putDouble("percent", ((double)download.getProgress()) / 100);
         progressReports.put(config.id, params);
         Date now = new Date();
-        if (now.getTime() - lastProgressReport.getTime() > 1000) {
+        if (now.getTime() - lastProgressReport.getTime() > 500) {
           WritableArray reportsArray = Arguments.createArray();
           for (WritableMap report : progressReports.values()) {
             reportsArray.pushMap(report);
@@ -428,5 +428,20 @@ public class RNBackgroundDownloaderModule extends ReactContextBaseJavaModule imp
 
   @Override
   public void onStarted(Download download, List<? extends DownloadBlock> list, int i) {
+    synchronized(sharedLock) {
+      RNBGDTaskConfig config = requestIdToConfig.get(download.getId());
+      if (config == null) {
+        return;
+      }
+
+      WritableMap params = Arguments.createMap();
+      params.putString("id", config.id);
+
+      if (!config.reportedBegin) {
+        params.putInt("expectedBytes", (int)download.getTotal());
+        ee.emit("downloadBegin", params);
+        config.reportedBegin = true;
+      }
+    }
   }
 }
