@@ -82,6 +82,7 @@ public class RNBackgroundDownloaderModule extends ReactContextBaseJavaModule imp
     loadConfigMap();
     FetchConfiguration fetchConfiguration = new FetchConfiguration.Builder(this.getReactApplicationContext())
             .setDownloadConcurrentLimit(4)
+            .setProgressReportingInterval(500)
             .setNamespace("RNBackgroundDownloader")
             .enableRetryOnNetworkGain(true)
             .setHttpDownloader(new HttpUrlConnectionDownloader(Downloader.FileDownloaderType.PARALLEL))
